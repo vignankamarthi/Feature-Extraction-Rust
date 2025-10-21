@@ -1,0 +1,46 @@
+# Data directories (PRIVATE/SENSITIVE - never commit)
+# Keep folder structure, ignore all contents
+data/*
+!data/test/
+!data/train/
+!data/validation/
+data/test/*
+data/train/*
+data/validation/*
+!data/test/.gitkeep
+!data/train/.gitkeep
+!data/validation/.gitkeep
+
+# Results directories (PRIVATE/SENSITIVE - never commit)
+# Keep folder structure, ignore all contents
+results/*
+!results/.gitkeep
+
+# Implementation guides (project-specific documentation)
+RUST_IMPLEMENTATION_GUIDE.md
+*RUST*IMPLEMENTATION*GUIDE*.md
+*IMPLEMENTATION*.md
+
+# Cargo build artifacts
+/target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+.directory
+.Trash-*
+
+# Rust development files
+*.orig
+.cargo/
+rustfmt.toml.bak

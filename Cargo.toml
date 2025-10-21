@@ -1,0 +1,110 @@
+# Cargo.toml - Rust's package manifest file (like package.json in Node.js or requirements.txt in Python)
+# Every Rust project has this file to define dependencies and metadata
+
+[package]
+name = "ai4pain_rust"           # Package name (like in package.json)
+version = "2.0.0"               # Semantic versioning (major.minor.patch)
+edition = "2021"                # Rust edition - similar to Python version or ECMAScript version
+authors = ["AI4Pain Team"]      # Package authors
+description = "Ultra-fast entropy-based feature extraction for physiological pain assessment"
+
+# In Rust, sections are denoted with [brackets] like TOML config files
+
+[dependencies]
+# Dependencies in Rust work like npm packages or pip packages
+# The versions use semantic versioning: "1.2.3" means exactly 1.2.3
+# "^1.2" means >=1.2.0 and <2.0.0 (caret like npm)
+
+# ndarray: N-dimensional arrays for Rust (equivalent to NumPy)
+# Rust doesn't have built-in matrix operations, so we use ndarray
+ndarray = "0.16"
+
+# ndarray-csv: Read CSV files directly into ndarray (like pandas.read_csv)
+ndarray-csv = "0.5"
+
+# csv: CSV parsing library (more control than ndarray-csv)
+csv = "1.3"
+
+# rayon: Data parallelism library (like Python's multiprocessing but better)
+# Automatically parallelizes iterators with .par_iter() - fearless concurrency!
+rayon = "1.10"
+
+# serde: Serialization/deserialization framework (like JSON.parse/stringify or pickle)
+# The "derive" feature lets us use #[derive(Serialize, Deserialize)] macros
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"              # JSON support for serde
+
+# statrs: Statistical computing library (like scipy.stats)
+statrs = "0.17"
+
+# indicatif: Progress bars (like tqdm in Python)
+indicatif = "0.17"
+
+# clap: Command Line Argument Parser (like argparse in Python or yargs in Node)
+# "derive" feature enables declarative CLI with structs
+clap = { version = "4.5", features = ["derive"] }
+
+# chrono: Date and time handling (like datetime in Python or Date in JS)
+chrono = "0.4"
+
+# anyhow: Error handling made easy (like try/catch but better)
+# Result<T, E> is Rust's way of handling errors without exceptions
+anyhow = "1.0"
+
+# log and env_logger: Logging framework (like Python's logging module)
+log = "0.4"
+env_logger = "0.11"
+
+# num-traits: Numeric traits for generic programming
+# Rust is strongly typed, so we need traits to work with different number types
+num-traits = "0.2"
+
+# nalgebra: Linear algebra library (alternative to ndarray for some operations)
+# Better for mathematical operations, transformations
+nalgebra = "0.32"
+
+# crossbeam: Advanced concurrency primitives (like Java's concurrent package)
+# Provides better channels than std::sync::mpsc
+crossbeam = "0.8"
+
+# dashmap: Concurrent HashMap (like ConcurrentHashMap in Java)
+# Thread-safe without explicit locking
+dashmap = "6.0"
+
+# num_cpus: Get the number of CPU cores
+# Used to determine optimal parallelism
+num_cpus = "1.16"
+
+# rand: Random number generation (for tests)
+rand = "0.8"
+
+# tempfile: Temporary files for testing
+tempfile = "3.13"
+
+# [dev-dependencies]
+# These are only used during development/testing (like devDependencies in package.json)
+[dev-dependencies]
+criterion = "0.5"                # Benchmarking framework (like Python's timeit)
+proptest = "1.5"                 # Property-based testing (like hypothesis in Python)
+approx = "0.5"                   # Approximate equality for floating point
+
+# [profile.release]
+# Build profiles control compilation settings
+[profile.release]
+opt-level = 3                    # Maximum optimizations (like -O3 in gcc)
+lto = true                       # Link Time Optimization (whole program optimization)
+codegen-units = 1                # Single codegen unit for better optimization
+panic = "abort"                  # Don't unwind on panic (smaller binary)
+strip = true                     # Strip debug symbols (smaller binary)
+
+# [profile.dev]
+# Development profile (default for cargo build)
+[profile.dev]
+opt-level = 0                    # No optimizations for fast compilation
+debug = true                     # Include debug symbols
+
+# [[bin]]
+# Define binary targets (executables)
+[[bin]]
+name = "ai4pain"                 # Binary name (what you run from command line)
+path = "src/main.rs"             # Entry point (like if __name__ == "__main__" in Python)
