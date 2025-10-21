@@ -511,6 +511,16 @@ ai4pain-rust/
 }
 ```
 
+---
+
+## Related Implementations
+
+**Python version** (reference implementation): [../AI4Pain-Feature-Extraction-V2/](../AI4Pain-Feature-Extraction-V2/)
+- See [IMPLEMENTATION_REPORT.md](../AI4Pain-Feature-Extraction-V2/IMPLEMENTATION_REPORT.md) for algorithm details
+
+---
+
 **Version**: 2.0.0
 **Author**: Vignan Kamarthi
 **Organization**: Northeastern University
+**Status**: Production Ready
