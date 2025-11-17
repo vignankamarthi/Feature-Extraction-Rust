@@ -1,3 +1,11 @@
+# Claude workflow files (untracked)
+CLAUDE.md
+CURRENT_STATE.md
+PROCESS.md
+
+# Documentation (generated, not committed)
+docs/
+
 # Data directories (PRIVATE/SENSITIVE - never commit)
 # Keep folder structure, ignore all contents
 data/*
@@ -44,3 +52,6 @@ Thumbs.db
 *.orig
 .cargo/
 rustfmt.toml.bak
+
+CLAUDE.md
+CURRENT_STATE.md
