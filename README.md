@@ -2,7 +2,7 @@
 
 **High-Performance Entropy Feature Extraction for Pain Assessment**
 
-Production-ready Rust implementation delivering **200× speedup** over Python with long-format output aligned with Jupyter notebook analysis pipeline. Maintains 100% numerical agreement with Python/ordpy implementation.
+Production-ready Rust implementation delivering **201× speedup** over Python with long-format output aligned with Jupyter notebook analysis pipeline. Maintains 100% numerical validation with Python/ordpy implementation.
 
 ---
 
@@ -10,15 +10,13 @@ Production-ready Rust implementation delivering **200× speedup** over Python wi
 
 This is a direct algorithmic translation of the Python implementation to Rust, preserving all mathematical operations while leveraging Rust's zero-cost abstractions and fearless concurrency:
 
-- **200× faster**: Processes signals at 4,000+ rows/second (7.3s vs. 24.5 minutes for train/Bvp)
+- **201× faster**: Processes signals at 4,000+ rows/second (7.3s vs. 24.5 minutes for train/Bvp)
 - **Long-format output**: 15 rows per signal, 16 columns per row (notebook-aligned)
 - **100% validated**: Numerical agreement with Python/ordpy within CSV precision (<1e-6)
 - **16× less memory**: 180 MB vs. 3.2 GB peak usage
 - **Multi-core parallelization**: Automatic via Rayon (12-core CPU utilized)
 - **Granular file organization**: Separate CSV per dataset × signal_type combination
 - **Bug-fixed**: Corrected Renyi/Tsallis ordering (validated against Python)
-
-**For Python → Rust translation guide, see [RUST_IMPLEMENTATION_GUIDE.md](RUST_IMPLEMENTATION_GUIDE.md)**
 
 ---
 
@@ -28,14 +26,12 @@ This is a direct algorithmic translation of the Python implementation to Rust, p
 
 | Metric | Python | Rust | Speedup |
 |--------|--------|------|---------|
-| Total runtime (train/Bvp) | 1,467s (24.5 min) | 7.33s | **200×** |
+| Total runtime (train/Bvp) | 1,467s (24.5 min) | 7.33s | **201×** |
 | Rows/second | 20.1 | 4,027 | **200×** |
 | Peak memory | 2-3 GB | 180 MB | **16× reduction** |
-| Numerical accuracy | Reference | 100% match | <1e-6 |
+| Numerical accuracy | Reference | 100% match | N/A |
 
 **Test dataset**: 29,520 rows (1,968 signals × 15 rows each), 16 columns per row, 8 entropy measures per row
-
-**For detailed performance breakdown, see [RUST_IMPLEMENTATION_GUIDE.md §5](RUST_IMPLEMENTATION_GUIDE.md)**
 
 ---
 
@@ -81,7 +77,7 @@ data/
 
 **CSV format**: Each column = one participant trial, rows = time samples
 
-**Note**: The `data/test/`, `data/train/`, and `data/validation/` directories are preserved as placeholders in the repository via `.gitkeep` files. All data files within these directories are gitignored for privacy.
+**Note**: The `data/test/`, `data/train/`, and `data/validation/` directories are preserved as placeholders in the repository via `.gitkeep` files. All data files within these directories are gitignored for data integrity.
 
 ### Auto-Generated Folders
 
@@ -154,11 +150,10 @@ src/
 ```
 
 **Key differences from Python**:
-- **No ordpy dependency**: Custom entropy implementation (200× faster)
+- **No ordpy dependency**: Custom entropy implementation
 - **Parallel processing**: Rayon parallel iterators (automatic multi-core)
 - **Static typing**: Compile-time guarantees, zero runtime overhead
 
-**For detailed module documentation, see [RUST_IMPLEMENTATION_GUIDE.md §2-3](RUST_IMPLEMENTATION_GUIDE.md)**
 
 ---
 
@@ -174,11 +169,11 @@ All five entropy measures use identical algorithms to Python/ordpy:
 
 **Validation**: 100% numerical agreement with Python across all parameters (d=3-7, τ=1-3)
 
-**For algorithm details and line-by-line comparison, see [RUST_IMPLEMENTATION_GUIDE.md §3](RUST_IMPLEMENTATION_GUIDE.md)**
-
 ---
 
 ## Validation
+
+Please [this implementation](https://github.com/vignankamarthi/AI4Pain-Feature-Extraction) for more details.
 
 **Comparison against Python**:
 ```bash
@@ -196,63 +191,6 @@ diff <(sort ../AI4Pain-Feature-Extraction-V2/results/python_features_train.csv) 
 
 **Expected result**: No differences (all 120 features match within floating-point precision)
 
-**For validation methodology, see [RUST_IMPLEMENTATION_GUIDE.md §5.1](RUST_IMPLEMENTATION_GUIDE.md)**
-
----
-
-## Development
-
-### Running Tests
-
-```bash
-# Unit tests for entropy calculations
-cargo test
-
-# Test specific module
-cargo test entropy
-
-# Run with output
-cargo test -- --nocapture
-```
-
-### Benchmarking
-
-```bash
-# Internal benchmark mode
-./target/release/ai4pain benchmark --iterations 1000
-
-# Cargo benchmarks (requires nightly)
-cargo bench
-```
-
-### Code Quality
-
-```bash
-# Format code
-cargo fmt
-
-# Lint with Clippy
-cargo clippy
-
-# Check without building
-cargo check
-```
-
-### Debug vs Release
-
-```bash
-# Debug build (fast compilation, slow runtime)
-cargo build
-cargo run -- extract --dataset train
-
-# Release build (slow compilation, fast runtime - REQUIRED for performance)
-cargo build --release
-./target/release/ai4pain extract --dataset train
-```
-
-**Important**: Always use `--release` for production. Debug builds are 30-100× slower.
-
----
 
 ## Configuration
 
@@ -280,91 +218,6 @@ cargo build --release
     --nan-threshold 90.0
 ```
 
----
-
-## Rust for Python/Java Developers
-
-### Key Concepts
-
-**Ownership**: Every value has exactly one owner; when owner goes out of scope, value is freed
-```rust
-let signal = vec![1.0, 2.0, 3.0];
-let result = process(signal);  // Ownership moved
-// signal is no longer valid here
-```
-
-**Borrowing**: Create references without transferring ownership
-```rust
-let signal = vec![1.0, 2.0, 3.0];
-let result = process(&signal);  // Borrow (reference)
-println!("{:?}", signal);       // signal still valid
-```
-
-**Error Handling**: No exceptions; use `Result<T, E>` type
-```rust
-fn calculate_entropy(signal: &[f64]) -> Result<f64, String> {
-    if signal.len() < 100 {
-        return Err("Signal too short".to_string());
-    }
-    // ... calculation
-    Ok(entropy)
-}
-
-// Usage:
-match calculate_entropy(&signal) {
-    Ok(value) => println!("Entropy: {}", value),
-    Err(e) => eprintln!("Error: {}", e),
-}
-```
-
-**Iterators**: Functional programming with zero overhead
-```rust
-let squares: Vec<f64> = signal.iter()
-    .filter(|&&x| x > 0.0)
-    .map(|&x| x * x)
-    .collect();
-```
-
-**For comprehensive Rust primer, see [RUST_IMPLEMENTATION_GUIDE.md §4](RUST_IMPLEMENTATION_GUIDE.md)**
-
----
-
-## Performance Optimization
-
-### Compilation Flags
-
-**Cargo.toml profile settings** (already configured):
-```toml
-[profile.release]
-opt-level = 3           # Maximum optimization
-lto = true              # Link-time optimization
-codegen-units = 1       # Single codegen unit (better optimization)
-```
-
-**CPU-specific optimizations**:
-```bash
-RUSTFLAGS="-C target-cpu=native" cargo build --release
-```
-
-### Parallelization
-
-**Rayon parallel iterators** (automatic):
-```rust
-// Sequential
-for file in files {
-    process_file(file);
-}
-
-// Parallel (just add par_iter)
-files.par_iter()
-    .for_each(|file| process_file(file));
-```
-
-**Speedup**: ~8× on 8-core CPU (entropy calculation is embarrassingly parallel)
-
-**For detailed performance analysis, see [RUST_IMPLEMENTATION_GUIDE.md §5](RUST_IMPLEMENTATION_GUIDE.md)**
-
----
 
 ## Dependencies
 
@@ -381,9 +234,6 @@ env_logger = "0.10"                                # Log configuration
 indicatif = "0.17"                                 # Progress bars
 ```
 
-**No Python/ordpy dependency**: Custom entropy implementation from scratch
-
----
 
 ## Troubleshooting
 
@@ -452,52 +302,6 @@ ai4pain-rust/
 └── README.md                   # This file
 ```
 
----
-
-## Learning Resources
-
-**For developers new to Rust**:
-
-1. **The Rust Book** (official tutorial): https://doc.rust-lang.org/book/
-   - Essential chapters: 4 (Ownership), 10 (Generics), 13 (Iterators)
-
-2. **Rust by Example**: https://doc.rust-lang.org/rust-by-example/
-   - Hands-on code examples
-
-3. **Rustlings** (interactive exercises): https://github.com/rust-lang/rustlings
-
-4. **Rayon Documentation** (parallelism): https://docs.rs/rayon/
-   - How to convert sequential code to parallel
-
-**For Python developers specifically**:
-- See [RUST_IMPLEMENTATION_GUIDE.md §4](RUST_IMPLEMENTATION_GUIDE.md) for Python → Rust syntax translation
-
----
-
-## Why Rust?
-
-**Performance**:
-- **Compiled to machine code**: No interpreter overhead
-- **SIMD auto-vectorization**: CPU parallel operations on arrays
-- **Zero-cost abstractions**: High-level code compiles to optimal assembly
-
-**Safety**:
-- **No null pointers**: Eliminated at compile time
-- **No data races**: Ownership system prevents concurrent access bugs
-- **No segfaults**: Memory safety guaranteed by compiler
-
-**Concurrency**:
-- **Fearless parallelization**: Rayon makes multi-threading trivial
-- **Thread safety**: Compiler enforces safe concurrent access
-- **No GIL**: True parallelism (unlike Python)
-
-**Efficiency**:
-- **Minimal memory**: No GC overhead, stack allocations
-- **Predictable performance**: No GC pauses
-
-**For detailed comparison, see [RUST_IMPLEMENTATION_GUIDE.md §1](RUST_IMPLEMENTATION_GUIDE.md)**
-
----
 
 ## Citation
 
@@ -515,12 +319,4 @@ ai4pain-rust/
 
 ## Related Implementations
 
-**Python version** (reference implementation): [../AI4Pain-Feature-Extraction-V2/](../AI4Pain-Feature-Extraction-V2/)
-- See [IMPLEMENTATION_REPORT.md](../AI4Pain-Feature-Extraction-V2/IMPLEMENTATION_REPORT.md) for algorithm details
-
----
-
-**Version**: 2.0.0
-**Author**: Vignan Kamarthi
-**Organization**: Northeastern University
-**Status**: Production Ready
+**Python version** (reference implementation): [Python Implementation](https://github.com/vignankamarthi/AI4Pain-Feature-Extraction)
